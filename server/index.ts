@@ -69,9 +69,14 @@ app.post('/api/chat', chatHandler);
 
 // ─── Start server ────────────────────────────────────────────────────────────
 
-app.listen(PORT, () => {
-  console.log(`🧑‍💻 ARVR Backend Server running on http://localhost:${PORT}`);
-  console.log(
-    `🔑 OpenAI API key ${process.env.OPENAI_API_KEY ? 'is set ✓' : 'is NOT set ✗'}`
-  );
-});
+// Only start the server when run directly (not when imported as a module by Vercel)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  app.listen(PORT, () => {
+    console.log(`🧑‍💻 ARVR Backend Server running on http://localhost:${PORT}`);
+    console.log(
+      `🔑 OpenAI API key ${process.env.OPENAI_API_KEY ? 'is set ✓' : 'is NOT set ✗'}`
+    );
+  });
+}
+
+export { app };

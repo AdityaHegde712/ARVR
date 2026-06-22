@@ -6,6 +6,7 @@ import { useModelPlacement } from './hooks/useModelPlacement';
 import { useAgent } from './hooks/useAgent';
 import { useVoiceInput } from './hooks/useVoiceInput';
 import { SelectedProductProvider } from './context/SelectedProductContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import ChatPanel from './components/ChatPanel';
 import ProductBrowser from './components/ProductBrowser';
 import type { Product } from './types';
@@ -52,6 +53,7 @@ function App() {
     messages: chatMessages,
     sendMessage,
     isProcessing,
+    selectedProduct: agentSelectedProduct,
   } = useAgent();
   const {
     isListening,
@@ -214,6 +216,28 @@ function App() {
     [],
   );
 
+  // ── Auto-place product when AI selects one ────────────────────────────
+  useEffect(() => {
+    if (!agentSelectedProduct) return;
+    setSelectedProductId(agentSelectedProduct.productId);
+
+    // If we have a detected surface in AR, place it there
+    if (viewMode === 'ar') {
+      const pos = handleTap();
+      if (pos) {
+        const product = catalogTyped.find(
+          (p) => p.id === agentSelectedProduct.productId,
+        );
+        if (product) {
+          placeProduct(product, pos, null);
+        }
+      }
+    }
+
+    // In fallback mode, user already clicks to place so just select the product
+    setShowChat(false);
+  }, [agentSelectedProduct, viewMode, handleTap, placeProduct]);
+
   // ── Handle canvas click/touch for AR mode ───────────────────────────────
   const onCanvasInteraction = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
@@ -227,7 +251,8 @@ function App() {
 
   // ── Render ──────────────────────────────────────────────────────────────
   return (
-    <div className="app">
+    <ErrorBoundary>
+    <div className="app fade-in">
       {/* ── Canvas ─────────────────────────────────────────────────── */}
       <canvas
         ref={canvasRef}
@@ -381,28 +406,33 @@ function App() {
 
       {/* ── Product browser panel ──────────────────────────────────── */}
       {showBrowser && <div className="ui-browser-backdrop" onClick={closeBrowser} />}
-      <div className={`ui-browser-panel ${showBrowser ? 'open' : ''}`}>
-        <ProductBrowser
-          products={catalog as unknown as Product[]}
-          selectedProductId={selectedProductId}
-          onSelectProduct={handleSelectProduct}
-        />
+      <div className={`ui-browser-panel slide-up ${showBrowser ? 'open' : ''}`}>
+        <ErrorBoundary>
+          <ProductBrowser
+            products={catalog as unknown as Product[]}
+            selectedProductId={selectedProductId}
+            onSelectProduct={handleSelectProduct}
+          />
+        </ErrorBoundary>
       </div>
 
       {/* ── Chat panel ─────────────────────────────────────────────── */}
       {showChat && (
-        <ChatPanel
-          messages={chatMessages}
-          onSendMessage={sendMessage}
-          isProcessing={isProcessing}
-          isListening={isListening}
-          isVoiceSupported={isVoiceSupported}
-          onToggleVoice={isListening ? stopListening : startListening}
-          selectedProductId={selectedProductId}
-          onPlaceInAR={handlePlaceInAR}
-        />
+        <ErrorBoundary>
+          <ChatPanel
+            messages={chatMessages}
+            onSendMessage={sendMessage}
+            isProcessing={isProcessing}
+            isListening={isListening}
+            isVoiceSupported={isVoiceSupported}
+            onToggleVoice={isListening ? stopListening : startListening}
+            selectedProductId={selectedProductId}
+            onPlaceInAR={handlePlaceInAR}
+          />
+        </ErrorBoundary>
       )}
     </div>
+    </ErrorBoundary>
   );
 }
 

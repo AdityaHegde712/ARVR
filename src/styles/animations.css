@@ -1,0 +1,62 @@
+/* ─── ARVR Furniture Visualizer — Animation Keyframes ─────────────────────── */
+
+/* Fade in (opacity 0 → 1) */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Slide up (translateY 20px → 0) */
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gentle opacity pulse (for mic/listening indicator) */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Full rotation (for spinners) */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Utility Classes ─────────────────────────────────────────────────────── */
+
+.fade-in {
+  animation: fadeIn 0.35s ease-out forwards;
+}
+
+.slide-up {
+  animation: slideUp 0.35s ease-out forwards;
+}
+
+.pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Spinner utility (add to any element to make it spin) */
+.spinner {
+  animation: spin 0.8s linear infinite;
+}

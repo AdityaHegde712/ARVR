@@ -102,7 +102,7 @@ export default function MessageBubble({ message, onPlaceInAR }: MessageBubblePro
   const showAvatar = !isUser && !isSystem;
 
   return (
-    <div style={wrapperStyle(message.role)}>
+    <div className="slide-up" style={wrapperStyle(message.role)}>
       <div style={bubbleRowStyle(message.role)}>
         {/* AI avatar / badge */}
         {showAvatar && (

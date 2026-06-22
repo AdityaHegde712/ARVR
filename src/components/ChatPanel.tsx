@@ -2,6 +2,7 @@ import { useRef, useEffect, useCallback, useState } from 'react';
 import type { Message } from '../types';
 import MessageBubble from './MessageBubble';
 import VoiceButton from './VoiceButton';
+import LoadingSpinner from './LoadingSpinner';
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
 const theme = {
@@ -301,7 +302,7 @@ export default function ChatPanel({
   const canSend = inputValue.trim().length > 0 && !isProcessing;
 
   return (
-    <div style={panelStyle}>
+    <div className="fade-in" style={panelStyle}>
       {/* Header */}
       <div style={headerStyle}>
         <div style={headerTitleStyle}>
@@ -389,11 +390,11 @@ export default function ChatPanel({
           onClick={handleSend}
           style={{
             ...sendBtnStyle,
-            opacity: canSend ? 1 : 0.35,
+            opacity: canSend || isProcessing ? 1 : 0.35,
             cursor: canSend ? 'pointer' : 'default',
           }}
-          disabled={!canSend}
-          aria-label="Send message"
+          disabled={!canSend && !isProcessing}
+          aria-label={isProcessing ? 'Processing' : 'Send message'}
           onMouseEnter={(e) => {
             if (canSend) {
               e.currentTarget.style.background = theme.sendBgHover;
@@ -403,7 +404,11 @@ export default function ChatPanel({
             e.currentTarget.style.background = theme.sendBg;
           }}
         >
-          <SendIcon />
+          {isProcessing ? (
+            <LoadingSpinner size={16} inline />
+          ) : (
+            <SendIcon />
+          )}
         </button>
       </div>
     </div>

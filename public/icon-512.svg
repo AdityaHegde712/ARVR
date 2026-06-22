@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Minimal armchair outline (scaled up) -->
+  <g fill="none" stroke="#e0e0e0" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Backrest -->
+    <rect x="100" y="80" width="312" height="200" rx="20" />
+    <!-- Seat -->
+    <rect x="80" y="264" width="352" height="112" rx="14" />
+    <!-- Left armrest -->
+    <rect x="48" y="192" width="52" height="160" rx="14" />
+    <!-- Right armrest -->
+    <rect x="412" y="192" width="52" height="160" rx="14" />
+    <!-- Left leg -->
+    <line x1="128" y1="376" x2="128" y2="464" />
+    <!-- Right leg -->
+    <line x1="384" y1="376" x2="384" y2="464" />
+    <!-- Center-left leg -->
+    <line x1="216" y1="376" x2="216" y2="448" />
+    <!-- Center-right leg -->
+    <line x1="296" y1="376" x2="296" y2="448" />
+    <!-- Cushion line -->
+    <line x1="136" y1="200" x2="376" y2="200" stroke-width="6" stroke-dasharray="16,10" />
+  </g>
+</svg>
