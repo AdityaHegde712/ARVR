@@ -348,9 +348,10 @@
   font-weight: 500;
 }
 
-/* ─── Browser toggle button ──────────────────────────────────────────── */
+/* ─── Toggle buttons ──────────────────────────────────────────────────── */
 
-.ui-browser-toggle {
+.ui-browser-toggle,
+.ui-chat-toggle {
   background: none;
   border: none;
   color: #e0e0e0;
@@ -359,6 +360,12 @@
   padding: 0.25rem 0.5rem;
   z-index: 100;
   pointer-events: auto;
+  line-height: 1;
+}
+
+.ui-chat-toggle {
+  margin-left: auto;
+  font-size: 1.3rem;
 }
 
 /* ─── Backdrop overlay ───────────────────────────────────────────────── */

@@ -3,6 +3,10 @@ import './App.css';
 import { useARSession } from './hooks/useARSession';
 import { useHitTest } from './hooks/useHitTest';
 import { useModelPlacement } from './hooks/useModelPlacement';
+import { useAgent } from './hooks/useAgent';
+import { useVoiceInput } from './hooks/useVoiceInput';
+import { SelectedProductProvider } from './context/SelectedProductContext';
+import ChatPanel from './components/ChatPanel';
 import ProductBrowser from './components/ProductBrowser';
 import type { Product } from './types';
 import {
@@ -41,8 +45,20 @@ function App() {
     [selectedProductId],
   );
   const [showBrowser, setShowBrowser] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
   // Hooks
+  const {
+    messages: chatMessages,
+    sendMessage,
+    isProcessing,
+  } = useAgent();
+  const {
+    isListening,
+    isSupported: isVoiceSupported,
+    startListening,
+    stopListening,
+  } = useVoiceInput();
   const { isSupported, sessionState, requestSession, endSession, error } =
     useARSession();
   const { isSurfaceDetected, handleTap } = useHitTest();
@@ -183,6 +199,21 @@ function App() {
     setShowBrowser(false);
   }, []);
 
+  const toggleChat = useCallback(() => {
+    setShowChat((prev) => !prev);
+  }, []);
+
+  const handlePlaceInAR = useCallback(
+    (productId: string) => {
+      const product = catalogTyped.find((p) => p.id === productId);
+      if (product) {
+        setSelectedProductId(productId);
+        setShowChat(false);
+      }
+    },
+    [],
+  );
+
   // ── Handle canvas click/touch for AR mode ───────────────────────────────
   const onCanvasInteraction = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
@@ -211,6 +242,13 @@ function App() {
           {showBrowser ? '✕' : '☰'}
         </button>
         <h1 className="ui-title">AR Furniture Visualizer</h1>
+        <button
+          className="ui-chat-toggle"
+          onClick={toggleChat}
+          aria-label="Toggle AI chat"
+        >
+          {showChat ? '✕' : '💬'}
+        </button>
         {viewMode === 'loading' && (
           <span className="ui-badge loading">Loading&hellip;</span>
         )}
@@ -350,8 +388,30 @@ function App() {
           onSelectProduct={handleSelectProduct}
         />
       </div>
+
+      {/* ── Chat panel ─────────────────────────────────────────────── */}
+      {showChat && (
+        <ChatPanel
+          messages={chatMessages}
+          onSendMessage={sendMessage}
+          isProcessing={isProcessing}
+          isListening={isListening}
+          isVoiceSupported={isVoiceSupported}
+          onToggleVoice={isListening ? stopListening : startListening}
+          selectedProductId={selectedProductId}
+          onPlaceInAR={handlePlaceInAR}
+        />
+      )}
     </div>
   );
 }
 
-export default App;
+function AppWithProvider() {
+  return (
+    <SelectedProductProvider>
+      <App />
+    </SelectedProductProvider>
+  );
+}
+
+export default AppWithProvider;
