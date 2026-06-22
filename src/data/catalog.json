@@ -1,0 +1,314 @@
+[
+  {
+    "id": "lounge-sofa",
+    "name": "Lounge Sofa",
+    "category": "Sofa",
+    "style": "Modern",
+    "color": "Gray",
+    "description": "A spacious modern sofa with clean lines and plush cushioning for comfortable lounging.",
+    "modelType": "placeholder",
+    "shape": "BoxGeometry",
+    "dimensions": {
+      "width": 2.0,
+      "height": 0.9,
+      "depth": 0.8
+    },
+    "colorHex": "#6B7280",
+    "thumbnailUrl": "/thumbnails/lounge-sofa.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  },
+  {
+    "id": "coffee-table",
+    "name": "Coffee Table",
+    "category": "Table",
+    "style": "Minimalist",
+    "color": "Brown",
+    "description": "A sleek low-profile coffee table with a warm wood finish, perfect for modern living rooms.",
+    "modelType": "placeholder",
+    "shape": "BoxGeometry",
+    "dimensions": {
+      "width": 1.2,
+      "height": 0.45,
+      "depth": 0.7
+    },
+    "colorHex": "#8B6914",
+    "thumbnailUrl": "/thumbnails/coffee-table.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  },
+  {
+    "id": "dining-chair",
+    "name": "Dining Chair",
+    "category": "Chair",
+    "style": "Scandinavian",
+    "color": "White",
+    "description": "An elegant Scandinavian dining chair with a light, minimal silhouette and comfortable seat.",
+    "modelType": "placeholder",
+    "shape": "BoxGeometry",
+    "dimensions": {
+      "width": 0.5,
+      "height": 0.9,
+      "depth": 0.5
+    },
+    "colorHex": "#E5E7EB",
+    "thumbnailUrl": "/thumbnails/dining-chair.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  },
+  {
+    "id": "floor-lamp",
+    "name": "Floor Lamp",
+    "category": "Lamp",
+    "style": "Modern",
+    "color": "Black",
+    "description": "A tall modern floor lamp with a slender stem and minimalist shade for ambient lighting.",
+    "modelType": "placeholder",
+    "shape": "CylinderGeometry",
+    "dimensions": {
+      "width": 0.2,
+      "height": 1.5,
+      "depth": 0.2
+    },
+    "colorHex": "#374151",
+    "thumbnailUrl": "/thumbnails/floor-lamp.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  },
+  {
+    "id": "double-bed",
+    "name": "Double Bed",
+    "category": "Bed",
+    "style": "Classic",
+    "color": "White",
+    "description": "A classic double bed with a clean white frame and ample space for a restful night's sleep.",
+    "modelType": "placeholder",
+    "shape": "BoxGeometry",
+    "dimensions": {
+      "width": 1.9,
+      "height": 0.5,
+      "depth": 2.0
+    },
+    "colorHex": "#F3F4F6",
+    "thumbnailUrl": "/thumbnails/double-bed.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  },
+  {
+    "id": "bookshelf",
+    "name": "Bookshelf",
+    "category": "Bookshelf",
+    "style": "Minimalist",
+    "color": "Brown",
+    "description": "A tall minimalist bookshelf with multiple tiers for organized storage and display.",
+    "modelType": "placeholder",
+    "shape": "BoxGeometry",
+    "dimensions": {
+      "width": 0.8,
+      "height": 1.8,
+      "depth": 0.3
+    },
+    "colorHex": "#92400E",
+    "thumbnailUrl": "/thumbnails/bookshelf.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  },
+  {
+    "id": "desk",
+    "name": "Desk",
+    "category": "Desk",
+    "style": "Modern",
+    "color": "White",
+    "description": "A modern white desk with a spacious work surface for productive home offices.",
+    "modelType": "placeholder",
+    "shape": "BoxGeometry",
+    "dimensions": {
+      "width": 1.2,
+      "height": 0.75,
+      "depth": 0.6
+    },
+    "colorHex": "#F9FAFB",
+    "thumbnailUrl": "/thumbnails/desk.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  },
+  {
+    "id": "area-rug",
+    "name": "Area Rug",
+    "category": "Rug",
+    "style": "Rustic",
+    "color": "Red",
+    "description": "A warm rustic area rug with a rich red tone that adds texture and comfort to any room.",
+    "modelType": "placeholder",
+    "shape": "BoxGeometry",
+    "dimensions": {
+      "width": 1.5,
+      "height": 0.05,
+      "depth": 2.0
+    },
+    "colorHex": "#991B1B",
+    "thumbnailUrl": "/thumbnails/area-rug.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  },
+  {
+    "id": "tv-cabinet",
+    "name": "TV Cabinet",
+    "category": "Cabinet",
+    "style": "Minimalist",
+    "color": "Black",
+    "description": "A sleek minimalist TV cabinet with a low profile for streamlined media storage.",
+    "modelType": "placeholder",
+    "shape": "BoxGeometry",
+    "dimensions": {
+      "width": 1.6,
+      "height": 0.5,
+      "depth": 0.4
+    },
+    "colorHex": "#1F2937",
+    "thumbnailUrl": "/thumbnails/tv-cabinet.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  },
+  {
+    "id": "potted-plant",
+    "name": "Potted Plant",
+    "category": "Plant",
+    "style": "Scandinavian",
+    "color": "Green",
+    "description": "A Scandinavian-inspired potted plant combining a cylindrical pot with a lush spherical canopy.",
+    "modelType": "placeholder",
+    "shape": "custom",
+    "dimensions": {
+      "width": 0.5,
+      "height": 0.9,
+      "depth": 0.5
+    },
+    "colorHex": "#059669",
+    "thumbnailUrl": "/thumbnails/potted-plant.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  },
+  {
+    "id": "side-table",
+    "name": "Side Table",
+    "category": "Table",
+    "style": "Modern",
+    "color": "Walnut",
+    "description": "A compact modern side table in rich walnut, ideal beside a sofa or bed for essentials.",
+    "modelType": "placeholder",
+    "shape": "BoxGeometry",
+    "dimensions": {
+      "width": 0.4,
+      "height": 0.6,
+      "depth": 0.4
+    },
+    "colorHex": "#78350F",
+    "thumbnailUrl": "/thumbnails/side-table.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  },
+  {
+    "id": "armchair",
+    "name": "Armchair",
+    "category": "Chair",
+    "style": "Classic",
+    "color": "Navy",
+    "description": "A classic navy armchair with comfortable padded armrests and timeless tailored styling.",
+    "modelType": "placeholder",
+    "shape": "BoxGeometry",
+    "dimensions": {
+      "width": 0.8,
+      "height": 0.8,
+      "depth": 0.75
+    },
+    "colorHex": "#1E3A5F",
+    "thumbnailUrl": "/thumbnails/armchair.jpg",
+    "scaleHint": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "placementHints": {
+      "surfaceType": "floor",
+      "defaultOrientation": 0.0
+    }
+  }
+]
