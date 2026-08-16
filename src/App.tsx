@@ -261,6 +261,7 @@ function App() {
         onTouchStart={onCanvasInteraction}
       />
 
+      <div id="xr-overlay">
       {/* ── Top bar ────────────────────────────────────────────────── */}
       <div className="ui-top-bar">
         <button className="ui-browser-toggle" onClick={toggleBrowser} aria-label="Toggle product browser">
@@ -431,6 +432,7 @@ function App() {
           />
         </ErrorBoundary>
       )}
+    </div>
     </div>
     </ErrorBoundary>
   );

@@ -101,8 +101,18 @@ export async function requestARSession(): Promise<XRSession> {
   setState('requesting');
 
   try {
+    // Find the DOM overlay root so UI elements stay interactive during AR
+    const overlayRoot = document.getElementById('xr-overlay');
+
     xrSession = await navigator.xr.requestSession('immersive-ar', {
       requiredFeatures: ['hit-test'],
+      optionalFeatures: ['dom-overlay'],
+      domOverlay: { root: overlayRoot! },
+    });
+
+    // Prevent XR from stealing touches on interactive UI elements
+    overlayRoot?.addEventListener('beforexrselect', (e) => {
+      e.preventDefault();
     });
 
     xrSession.addEventListener('end', onSessionEnd);

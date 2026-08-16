@@ -395,3 +395,27 @@
 .ui-browser-panel.open {
   transform: translateX(0);
 }
+
+/* ─── XR DOM overlay root ─────────────────────────────────── */
+#xr-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Interactive children re-enable pointer events */
+#xr-overlay button,
+#xr-overlay input,
+#xr-overlay textarea,
+#xr-overlay select,
+#xr-overlay a,
+#xr-overlay [role="button"] {
+  pointer-events: auto;
+}
+
+/* Panels that need interaction also re-enable pointer events */
+#xr-overlay .ui-browser-panel,
+#xr-overlay .fade-in {
+  pointer-events: auto;
+}
