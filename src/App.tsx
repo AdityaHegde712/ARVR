@@ -46,6 +46,7 @@ function App() {
     [selectedProductId],
   );
   const [showBrowser, setShowBrowser] = useState(false);
+  const [browserMinimized, setBrowserMinimized] = useState(false);
   const [showChat, setShowChat] = useState(false);
 
   // Hooks
@@ -195,10 +196,16 @@ function App() {
 
   const toggleBrowser = useCallback(() => {
     setShowBrowser((prev) => !prev);
+    setBrowserMinimized(false);
   }, []);
 
   const closeBrowser = useCallback(() => {
     setShowBrowser(false);
+    setBrowserMinimized(false);
+  }, []);
+
+  const toggleBrowserMinimized = useCallback(() => {
+    setBrowserMinimized((prev) => !prev);
   }, []);
 
   const toggleChat = useCallback(() => {
@@ -407,14 +414,38 @@ function App() {
 
       {/* ── Product browser panel ──────────────────────────────────── */}
       {showBrowser && <div className="ui-browser-backdrop" onClick={closeBrowser} />}
-      <div className={`ui-browser-panel slide-up ${showBrowser ? 'open' : ''}`}>
-        <ErrorBoundary>
-          <ProductBrowser
-            products={catalog as unknown as Product[]}
-            selectedProductId={selectedProductId}
-            onSelectProduct={handleSelectProduct}
-          />
-        </ErrorBoundary>
+      <div
+        className={`ui-browser-panel ${showBrowser ? 'open' : ''} ${
+          browserMinimized ? 'minimized' : ''
+        }`}
+      >
+        <button
+          className="ui-browser-minimize"
+          onClick={toggleBrowserMinimized}
+          aria-expanded={!browserMinimized}
+          aria-label={
+            browserMinimized
+              ? 'Expand product browser'
+              : 'Minimize product browser'
+          }
+        >
+          <span className="ui-browser-minimize-handle" aria-hidden="true" />
+          <span className="ui-browser-minimize-label">
+            {browserMinimized ? selectedProduct?.name ?? 'Products' : 'Minimize'}
+          </span>
+          <span className="ui-browser-minimize-chevron" aria-hidden="true">
+            {browserMinimized ? '▲' : '▼'}
+          </span>
+        </button>
+        <div className="ui-browser-content">
+          <ErrorBoundary>
+            <ProductBrowser
+              products={catalog as unknown as Product[]}
+              selectedProductId={selectedProductId}
+              onSelectProduct={handleSelectProduct}
+            />
+          </ErrorBoundary>
+        </div>
       </div>
 
       {/* ── Chat panel ─────────────────────────────────────────────── */}
