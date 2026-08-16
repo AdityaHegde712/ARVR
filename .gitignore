@@ -65,3 +65,8 @@ Thumbs.db
 
 # Agents
 .agent-tasks/
+
+# Local hosting + tooling artifacts
+.host-logs/
+.compactions/
+vercel_log.txt
