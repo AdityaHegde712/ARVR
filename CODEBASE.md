@@ -2,7 +2,7 @@
 
 > WebXR AR furniture visualizer with a conversational AI agent that searches a 12-item product catalog, recommends items via OpenAI function calling, and places procedurally generated 3D models onto detected real-world surfaces.
 
-**Last updated:** 2026-06-27
+**Last updated:** 2026-08-16
 **Primary language:** TypeScript (strict mode, ES2020 target)
 **Architecture style:** Client-heavy monolith with serverless API proxy (Vercel)
 
@@ -153,6 +153,9 @@ Tool calls (`search_products`, `get_product_details`, `select_product`) are exec
 
 **Procedural geometry over GLTF models**
 All 3D models are generated at runtime from `BoxGeometry`, `CylinderGeometry`, and `SphereGeometry` primitives. The `potted-plant` has a custom multi-mesh builder. Rationale: avoids external asset downloads, licensing issues, and large payloads. The `shape` field in `catalog.json` determines which geometry type to use.
+
+**Placeholder meshes are boxes, not real models (KNOWN LIMITATION)**
+The preloaded meshes are currently rectangular boxes scaled to the product's catalog `dimensions` — they are placeholders, not realistic furniture. This is intentional for now, but noted for a future session: real furniture should use GLTF/GLB assets (or significantly more detailed procedural geometry) before demoing to users.
 
 **Non-streaming LLM responses**
 The backend returns the complete OpenAI response at once rather than streaming tokens. Rationale: simplifies the MVP implementation. GPT-4o-mini responses for this use case are short enough that streaming provides minimal UX benefit.

@@ -112,6 +112,13 @@ All 6 commits pushed to `origin/main` at `github.com/AdityaHegde712/ARVR`.
 
 ---
 
+## Known Limitations (as of Aug 16, 2026)
+
+- **Placeholder box meshes**: All catalog meshes are rectangular boxes scaled to the product's `dimensions` (see `ModelLoader.ts`). Fine for now, but real furniture needs GLTF/GLB assets or much richer procedural geometry before user demos.
+- **iOS Safari has no WebXR depth**: Camera-to-depth occlusion is possible on Android Chrome (WebXR Depth Sensing API) but not on iOS. ML-based monocular depth (e.g. Depth Anything V2 Small via transformers.js/ONNX Runtime Web) is the only cross-platform path — research findings recorded in the Aug 16 session. See `src/depth/` when it's built.
+
+---
+
 ## Context for Resuming
 
 ### Running the app
