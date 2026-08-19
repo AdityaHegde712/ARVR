@@ -368,6 +368,34 @@
   font-size: 1.3rem;
 }
 
+.ui-depth-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.45rem 0.6rem;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 999px;
+  color: #e0e0e0;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  z-index: 100;
+  pointer-events: auto;
+}
+.ui-depth-toggle:hover {
+  background: #2a2a2a;
+}
+.ui-depth-icon {
+  font-size: 0.85rem;
+}
+.ui-depth-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #aaa;
+}
+
 /* ─── Backdrop overlay ───────────────────────────────────────────────── */
 
 .ui-browser-backdrop {

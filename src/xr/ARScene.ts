@@ -1,4 +1,10 @@
 import * as THREE from 'three';
+import {
+  initDepthSources,
+  setSession as setDepthSession,
+  getActiveSource,
+} from '../depth/depthManager';
+import { applyOcclusion, clearOcclusion } from '../shaders/occlusionMaterial';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export type SessionState =
@@ -17,6 +23,9 @@ let referenceSpace: XRReferenceSpace | null = null;
 let sessionState: SessionState = 'idle';
 let stateChangeListeners: Array<(state: SessionState) => void> = [];
 let animationActive = false;
+let depthTexture: THREE.Texture | null = null;
+let xrWebGLBinding: XRWebGLBinding | null = null;
+let depthFrameCounter = 0;
 
 // ─── Initialization ──────────────────────────────────────────────────────────
 
@@ -38,6 +47,9 @@ export function initScene(canvas: HTMLCanvasElement): void {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.xr.enabled = true;
+  renderer.setClearColor(0x000000, 0);
+
+  initDepthSources();
 
   scene = new THREE.Scene();
 
@@ -106,7 +118,11 @@ export async function requestARSession(): Promise<XRSession> {
 
     xrSession = await navigator.xr.requestSession('immersive-ar', {
       requiredFeatures: ['hit-test'],
-      optionalFeatures: ['dom-overlay'],
+      optionalFeatures: ['dom-overlay', 'depth-sensing'],
+      depthSensing: {
+        usagePreference: ['cpu-optimized', 'gpu-optimized'],
+        dataFormatPreference: ['luminance-alpha', 'float32'],
+      },
       domOverlay: { root: overlayRoot! },
     });
 
@@ -118,10 +134,29 @@ export async function requestARSession(): Promise<XRSession> {
     xrSession.addEventListener('end', onSessionEnd);
     xrSession.addEventListener('visibilitychange', onVisibilityChange);
 
-    referenceSpace = await xrSession.requestReferenceSpace('local-floor');
+    // Create the WebGL binding used to read API depth textures
+    if (renderer) {
+      try {
+        const gl = renderer.getContext() as WebGL2RenderingContext;
+        xrWebGLBinding = new XRWebGLBinding(xrSession, gl);
+      } catch (err) {
+        console.warn('[ARScene] XRWebGLBinding unavailable:', err);
+      }
+    }
+    setDepthSession(xrSession);
+
+    // Try local-floor first (world-stable), fall back to viewer if unsupported.
+    let refSpaceType: XRReferenceSpaceType = 'local-floor';
+    try {
+      referenceSpace = await xrSession.requestReferenceSpace('local-floor');
+    } catch {
+      console.warn('[ARScene] local-floor not supported, falling back to viewer');
+      referenceSpace = await xrSession.requestReferenceSpace('viewer');
+      refSpaceType = 'viewer';
+    }
 
     if (renderer) {
-      renderer.xr.setReferenceSpaceType('local-floor');
+      renderer.xr.setReferenceSpaceType(refSpaceType);
       await renderer.xr.setSession(xrSession);
     }
 
@@ -157,6 +192,10 @@ function onVisibilityChange(): void {
 function cleanupSession(): void {
   xrSession = null;
   referenceSpace = null;
+  xrWebGLBinding = null;
+  depthTexture = null;
+  depthFrameCounter = 0;
+  setDepthSession(null);
 }
 
 // ─── State management ────────────────────────────────────────────────────────
@@ -205,6 +244,24 @@ export function getSessionState(): SessionState {
   return sessionState;
 }
 
+/**
+ * Return all placed furniture meshes in the scene that use a physical
+ * material. Used by the occlusion shader to update materials each frame.
+ */
+export function getModelMeshes(): THREE.Mesh[] {
+  if (!scene) return [];
+  const meshes: THREE.Mesh[] = [];
+  scene.traverse((child) => {
+    if (
+      child instanceof THREE.Mesh &&
+      child.material instanceof THREE.MeshPhysicalMaterial
+    ) {
+      meshes.push(child);
+    }
+  });
+  return meshes;
+}
+
 // ─── Animation loop ──────────────────────────────────────────────────────────
 
 /**
@@ -227,8 +284,61 @@ export function startAnimationLoop(
 
     if (renderer && scene && camera) {
       renderer.render(scene, camera);
+      updateDepthOcclusion(frame);
     }
   });
+}
+
+/**
+ * Refresh the depth texture from the active source and apply occlusion to
+ * every placed furniture mesh. ML inference is throttled to every 10th frame.
+ */
+function updateDepthOcclusion(frame?: XRFrame): void {
+  if (!scene || !camera) return;
+
+  const source = getActiveSource();
+
+  if (!source.isAvailable()) {
+    depthTexture = null;
+  } else if (frame && xrSession && referenceSpace) {
+    const pose = frame.getViewerPose(referenceSpace);
+    const view = pose?.views[0];
+
+    depthFrameCounter++;
+    const shouldRefreshDepth =
+      source.name === 'api' || depthFrameCounter % 10 === 0;
+
+    if (view && shouldRefreshDepth && renderer) {
+      const gl = renderer.getContext() as WebGL2RenderingContext;
+      const result = source.getDepthTexture(
+        frame,
+        view,
+        gl,
+        xrWebGLBinding,
+      );
+      // ML source returns a Promise; fire-and-forget with guard.
+      if (result instanceof Promise) {
+        result.then((tex) => { depthTexture = tex; }).catch(() => {});
+      } else {
+        depthTexture = result;
+      }
+    }
+  }
+
+  const meshes = getModelMeshes();
+  for (const mesh of meshes) {
+    const material = mesh.material as THREE.MeshPhysicalMaterial;
+    if (depthTexture) {
+      applyOcclusion(
+        material,
+        depthTexture,
+        camera.projectionMatrix,
+        camera.matrixWorldInverse,
+      );
+    } else {
+      clearOcclusion(material);
+    }
+  }
 }
 
 /**
@@ -250,6 +360,7 @@ export function dispose(): void {
   stopAnimationLoop();
   endARSession();
   stateChangeListeners = [];
+  setDepthSession(null);
 
   if (renderer) {
     renderer.dispose();

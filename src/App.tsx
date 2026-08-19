@@ -18,6 +18,7 @@ import {
   dispose as disposeFallback,
 } from './xr/FallbackViewport';
 import { getScene, getCamera } from './xr/ARScene';
+import { setMode, getMode, isAppleDevice } from './depth/depthManager';
 import { setScene } from './xr/ModelPlacer';
 import {
   initModelManipulator,
@@ -48,6 +49,7 @@ function App() {
   const [showBrowser, setShowBrowser] = useState(false);
   const [browserMinimized, setBrowserMinimized] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [depthMode, setDepthModeState] = useState<'api' | 'ml'>(getMode());
 
   // Hooks
   const {
@@ -212,6 +214,33 @@ function App() {
     setShowChat((prev) => !prev);
   }, []);
 
+  const [depthLoading, setDepthLoading] = useState(false);
+
+  const handleDepthToggle = useCallback(async () => {
+    const newMode = depthMode === 'api' ? 'ml' : 'api';
+
+    // If switching to ML on an Apple device, show alert first
+    if (newMode === 'ml' && isAppleDevice()) {
+      const confirmed = window.confirm(
+        'Your device does not support the WebXR Depth API. ' +
+          'The app will download the ML depth model (~26MB). ' +
+          'This may take a moment on slower connections.',
+      );
+      if (!confirmed) return;
+    }
+
+    setDepthLoading(true);
+    try {
+      await setMode(newMode);
+      setDepthModeState(newMode);
+    } catch (err) {
+      console.error('[Depth] Failed to switch mode:', err);
+      // Stay on current mode — do not alert, just log
+    } finally {
+      setDepthLoading(false);
+    }
+  }, [depthMode]);
+
   const handlePlaceInAR = useCallback(
     (productId: string) => {
       const product = catalogTyped.find((p) => p.id === productId);
@@ -282,6 +311,21 @@ function App() {
         >
           {showChat ? '✕' : '💬'}
         </button>
+        {viewMode === 'ar' && (
+          <button
+            className="ui-depth-toggle"
+            onClick={handleDepthToggle}
+            disabled={depthLoading}
+            title={`Depth: ${depthMode === 'api' ? 'WebXR API' : 'ML Model'}${depthLoading ? ' (loading…)' : ''}`}
+          >
+            <span className="ui-depth-icon">
+              {depthLoading ? '⏳' : depthMode === 'api' ? '📡' : '🧠'}
+            </span>
+            <span className="ui-depth-label">
+              {depthLoading ? 'Loading…' : depthMode === 'api' ? 'API' : 'ML'}
+            </span>
+          </button>
+        )}
         {viewMode === 'loading' && (
           <span className="ui-badge loading">Loading&hellip;</span>
         )}
