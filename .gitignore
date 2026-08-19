@@ -70,3 +70,6 @@ Thumbs.db
 .host-logs/
 .compactions/
 vercel_log.txt
+HANDOFF.md
+android
+temp
