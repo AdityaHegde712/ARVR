@@ -57,6 +57,7 @@ Thumbs.db
 .compactions/
 temp/
 android/
+app/src/main/assets/ml/depth_anything_v2_small_float.tflite
 
 # Legacy web app
 legacy-web-app/

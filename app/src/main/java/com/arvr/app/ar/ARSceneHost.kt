@@ -1,8 +1,12 @@
 package com.arvr.app.ar
 
 import android.content.Context
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateCentroid
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateRotation
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -95,10 +99,13 @@ class ArCoordinator(private val appContext: Context) {
     lateinit var placementController: PlacementController
         private set
 
+    private var pendingActiveModel: FurnitureModel? = null
+
     /** Model the user picked in the sheet; placed on the next surface tap. */
     var activeModel: FurnitureModel?
-        get() = if (::placementController.isInitialized) placementController.getActiveModel() else null
+        get() = if (::placementController.isInitialized) placementController.getActiveModel() else pendingActiveModel
         set(value) {
+            pendingActiveModel = value
             if (::placementController.isInitialized) placementController.setActiveModel(value)
         }
 
@@ -151,6 +158,7 @@ class ArCoordinator(private val appContext: Context) {
             val model = controller.getActiveModel()
             if (model != null) PlacedItem(model, anchor) else Unit
         })
+        pendingActiveModel?.let { controller.setActiveModel(it) }
         return controller
     }
 
@@ -194,10 +202,13 @@ class ArCoordinator(private val appContext: Context) {
         val frame = currentFrame ?: return
 
         val hit = try {
-            frame.hitTest(pointerX, pointerY).firstOrNull { result ->
+            val hits = frame.hitTest(pointerX, pointerY)
+            hits.firstOrNull { result ->
                 val trackable = result.trackable
                 trackable is Plane && trackable.isPoseInPolygon(result.hitPose)
-            }
+            } ?: hits.firstOrNull { result ->
+                result.trackable is Plane
+            } ?: hits.firstOrNull()
         } catch (_: Exception) {
             null
         } ?: return
@@ -325,7 +336,7 @@ fun ARSceneHost(coordinator: ArCoordinator, modifier: Modifier = Modifier) {
                             if (instance != null) {
                                 ModelNode(
                                     modelInstance = instance,
-                                    scaleToUnits = 1.0f,
+                                    scaleToUnits = null,
                                 )
                             }
                         }
@@ -340,23 +351,54 @@ fun ARSceneHost(coordinator: ArCoordinator, modifier: Modifier = Modifier) {
             cameraStream.isDepthOcclusionEnabled = coordinator.depthMode == DepthMode.API
         }
 
-        // Gesture overlay: tap = place, pan = drag, pinch = scale, twist = rotate.
+        // Gesture overlay: tap = place, single-finger drag = reposition, pinch = scale, twist = rotate.
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
-                    detectTapGestures { offset ->
-                        coordinator.tap(offset.x, offset.y)
-                    }
-                }
-                .pointerInput(Unit) {
-                    detectTransformGestures { centroid, pan, zoom, rotationDegrees ->
-                        if (zoom != 1f) coordinator.pinch(zoom)
-                        if (rotationDegrees != 0f) {
-                            coordinator.twist(Math.toRadians(rotationDegrees.toDouble()).toFloat())
-                        }
-                        if (pan.x != 0f || pan.y != 0f) {
-                            coordinator.drag(pan.x, pan.y, centroid.x, centroid.y)
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        var dragOrTransform = false
+                        var lastPosition = down.position
+                        val initialDownPosition = down.position
+
+                        do {
+                            val event = awaitPointerEvent()
+                            val pointerCount = event.changes.count { it.pressed }
+
+                            if (pointerCount == 1) {
+                                val change = event.changes.firstOrNull { it.pressed }
+                                if (change != null) {
+                                    val dragDistance = (change.position - initialDownPosition).getDistance()
+                                    val touchSlop = viewConfiguration.touchSlop
+                                    if (dragDistance > touchSlop) {
+                                        dragOrTransform = true
+                                        val pan = change.position - lastPosition
+                                        coordinator.drag(pan.x, pan.y, change.position.x, change.position.y)
+                                        change.consume()
+                                    }
+                                    lastPosition = change.position
+                                }
+                            } else if (pointerCount > 1) {
+                                dragOrTransform = true
+                                val zoom = event.calculateZoom()
+                                val rotation = event.calculateRotation()
+                                val pan = event.calculatePan()
+                                val centroid = event.calculateCentroid()
+
+                                if (zoom != 1f) coordinator.pinch(zoom)
+                                if (rotation != 0f) {
+                                    coordinator.twist(Math.toRadians(rotation.toDouble()).toFloat())
+                                }
+                                if (pan.x != 0f || pan.y != 0f) {
+                                    coordinator.drag(pan.x, pan.y, centroid.x, centroid.y)
+                                }
+                                event.changes.forEach { it.consume() }
+                            }
+                        } while (event.changes.any { it.pressed })
+
+                        if (!dragOrTransform) {
+                            coordinator.tap(initialDownPosition.x, initialDownPosition.y)
                         }
                     }
                 },
