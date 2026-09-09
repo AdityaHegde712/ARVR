@@ -31,7 +31,20 @@ class PlacementController(
         val model = activeModel ?: return false
 
         val hitResults = frame.hitTest(x, y)
-        val hitResult = hitResults.firstOrNull() ?: return false
+        val hitResult = try {
+            hitResults.firstOrNull { result ->
+                val trackable = result.trackable
+                trackable is com.google.ar.core.Plane && trackable.isPoseInPolygon(result.hitPose)
+            } ?: hitResults.firstOrNull { result ->
+                result.trackable is com.google.ar.core.Plane
+            } ?: hitResults.firstOrNull { result ->
+                result.trackable is com.google.ar.core.InstantPlacementPoint
+            } ?: hitResults.firstOrNull { result ->
+                result.trackable is com.google.ar.core.DepthPoint
+            } ?: hitResults.firstOrNull()
+        } catch (_: Throwable) {
+            hitResults.firstOrNull()
+        } ?: return false
 
         val anchor = hitResult.createAnchor()
         // Monotonic counter: timestamps collide on rapid successive taps.

@@ -23,7 +23,9 @@ import com.arvr.app.model.FurnitureModel
 import com.arvr.app.model.ModelRepository
 import com.google.ar.core.Anchor
 import com.google.ar.core.Config
+import com.google.ar.core.DepthPoint
 import com.google.ar.core.Frame
+import com.google.ar.core.InstantPlacementPoint
 import com.google.ar.core.Plane
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingState
@@ -52,6 +54,7 @@ import java.nio.ByteBuffer
 class PlacedItem(
     val model: FurnitureModel,
     anchor: Anchor,
+    val id: String = java.util.UUID.randomUUID().toString(),
 ) {
     var anchor: Anchor by mutableStateOf(anchor)
 
@@ -118,6 +121,7 @@ class ArCoordinator(private val appContext: Context) {
     // ── Session hooks (wired by ARSceneHost) ─────────────────────────────────
 
     fun configureSession(session: Session, config: Config) {
+        config.instantPlacementMode = Config.InstantPlacementMode.LOCAL_Y_UP
         val manager = DepthManager(session)
         manager.configureDepth(config)
         depthManager = manager
@@ -208,6 +212,10 @@ class ArCoordinator(private val appContext: Context) {
                 trackable is Plane && trackable.isPoseInPolygon(result.hitPose)
             } ?: hits.firstOrNull { result ->
                 result.trackable is Plane
+            } ?: hits.firstOrNull { result ->
+                result.trackable is InstantPlacementPoint
+            } ?: hits.firstOrNull { result ->
+                result.trackable is DepthPoint
             } ?: hits.firstOrNull()
         } catch (_: Exception) {
             null
@@ -326,19 +334,15 @@ fun ARSceneHost(coordinator: ArCoordinator, modifier: Modifier = Modifier) {
             },
         ) {
             coordinator.placements.forEach { item ->
-                key(item, item.anchor) {
+                key(item.id) {
+                    val instance = rememberModelInstance(modelLoader, item.model.assetPath)
                     AnchorNode(anchor = item.anchor) {
-                        Node(
-                            scale = Scale(item.scale),
-                            rotation = Rotation(y = item.yawDegrees),
-                        ) {
-                            val instance = rememberModelInstance(modelLoader, item.model.assetPath)
-                            if (instance != null) {
-                                ModelNode(
-                                    modelInstance = instance,
-                                    scaleToUnits = null,
-                                )
-                            }
+                        if (instance != null) {
+                            ModelNode(
+                                modelInstance = instance,
+                                scale = Scale(item.scale),
+                                rotation = Rotation(y = item.yawDegrees),
+                            )
                         }
                     }
                 }
