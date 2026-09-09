@@ -1,8 +1,0 @@
-node_modules
-.git
-server/node_modules
-server/package-lock.json
-*.log
-*.local
-.vercel
-*.tsbuildinfo
